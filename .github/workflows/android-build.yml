@@ -36,7 +36,10 @@ jobs:
         env:
           GSJ: ${{ secrets.GOOGLE_SERVICES_JSON }}
         run: |
-          if [ -n "$GSJ" ]; then echo "$GSJ" > android/app/google-services.json; fi
+          if [ -z "$GSJ" ]; then echo "SECRET IS EMPTY"; exit 1; fi
+          echo "$GSJ" > android/app/google-services.json
+          ls -l android/app/google-services.json
+          grep -c package_name android/app/google-services.json
       - name: Build
         working-directory: android
         run: gradle assembleDebug --no-daemon
