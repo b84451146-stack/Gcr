@@ -1,0 +1,28 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Students can only touch their own data. Teachers get reports through the
+    // Cloud Function (Admin SDK), which first verifies them against Google Classroom.
+    match /users/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow create, update: if request.auth != null
+        && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['email', 'displayName', 'updatedAt']);
+      allow delete: if false;
+
+      // One doc per day per AI app: "<yyyy-MM-dd>_<packageName>"
+      match /usage/{recordId} {
+        allow read: if request.auth != null && request.auth.uid == uid;
+        allow create, update: if request.auth != null
+          && request.auth.uid == uid
+          && request.resource.data.keys().hasOnly(
+               ['date', 'packageName', 'appName', 'seconds', 'source', 'updatedAt'])
+          && request.resource.data.seconds is int
+          && request.resource.data.seconds >= 0
+          && request.resource.data.seconds <= 86400;
+        allow delete: if request.auth != null && request.auth.uid == uid;
+      }
+    }
+  }
+}

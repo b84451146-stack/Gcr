@@ -1,0 +1,37 @@
+<!doctype html>
+<html><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GCR Eco</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="config.js"></script>
+</head><body>
+<h1>GCR Eco - AI usage report</h1>
+<p class="muted">Attach the AI usage report to this Classroom item. You will then see your class's
+AI app usage (from the GCR Eco Tracker app) on the teacher view.</p>
+<button id="attach">Attach report</button>
+<p id="status" class="muted"></p>
+<script src="common.js"></script>
+<script>
+const SCOPE = "openid email https://www.googleapis.com/auth/classroom.addons.teacher https://www.googleapis.com/auth/classroom.rosters.readonly";
+document.getElementById("attach").onclick = async () => {
+  try {
+    if (!params.get("addOnToken") || !params.get("itemId")) throw new Error("Open this from inside Google Classroom.");
+    setStatus("Signing in...");
+    const token = await getToken(SCOPE);
+    setStatus("Attaching...");
+    await api("/api/attach", token, {
+      method: "POST",
+      body: JSON.stringify({
+        courseId: params.get("courseId"),
+        itemId: params.get("itemId"),
+        itemType: params.get("itemType") || "courseWork",
+        addOnToken: params.get("addOnToken"),
+      }),
+    });
+    setStatus("Attached! You can close this window.");
+    setTimeout(() => window.close(), 1200);
+  } catch (e) { setStatus(e.message, true); }
+};
+</script>
+</body></html>

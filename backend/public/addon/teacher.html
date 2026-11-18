@@ -1,0 +1,52 @@
+<!doctype html>
+<html><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GCR Eco - Teacher view</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="config.js"></script>
+</head><body>
+<h1>AI app usage - last 7 days</h1>
+<p class="muted">Real app-open time from the GCR Eco Tracker app on students' phones. It cannot see prompts
+or conversations, and it does not detect AI used in a browser or unsupported apps. Students who have not
+installed or signed in to the app show as "Not set up".</p>
+<button id="load">Sign in and load report</button>
+<p id="status" class="muted"></p>
+<div id="summary"></div>
+<table id="table" hidden>
+  <thead><tr><th>Student</th><th>Total</th><th>By app</th><th>Last sync</th></tr></thead>
+  <tbody></tbody>
+</table>
+<script src="common.js"></script>
+<script>
+const SCOPE = "openid email https://www.googleapis.com/auth/classroom.rosters.readonly https://www.googleapis.com/auth/classroom.profile.emails";
+document.getElementById("load").onclick = async () => {
+  try {
+    const courseId = params.get("courseId");
+    if (!courseId) throw new Error("Open this from inside Google Classroom.");
+    setStatus("Signing in...");
+    const token = await getToken(SCOPE);
+    setStatus("Loading report...");
+    const rep = await api("/api/report?courseId=" + encodeURIComponent(courseId), token);
+
+    const sum = document.getElementById("summary");
+    sum.replaceChildren(
+      el("p", "Class total: " + mins(rep.classTotalSeconds) + " | App set up: " +
+        rep.installedCount + " of " + rep.rosterCount + " students | From " + rep.since)
+    );
+    const tbody = document.querySelector("#table tbody");
+    tbody.replaceChildren();
+    for (const s of rep.students) {
+      const tr = document.createElement("tr");
+      tr.append(el("td", s.name));
+      tr.append(el("td", s.installed ? mins(s.totalSeconds) : "Not set up"));
+      tr.append(el("td", s.installed ? appsText(s.byApp) : "-"));
+      tr.append(el("td", s.lastSync ? new Date(s.lastSync).toLocaleString() : "-"));
+      tbody.append(tr);
+    }
+    document.getElementById("table").hidden = false;
+    setStatus("");
+  } catch (e) { setStatus(e.message, true); }
+};
+</script>
+</body></html>

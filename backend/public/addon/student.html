@@ -1,0 +1,34 @@
+<!doctype html>
+<html><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GCR Eco - Student view</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="config.js"></script>
+</head><body>
+<h1>Your AI app usage</h1>
+<p class="muted">Install the GCR Eco Tracker app on your phone and sign in with this school account.
+Your teacher sees app name, date and minutes only, never your prompts or conversations.</p>
+<button id="load">Sign in and show my usage</button>
+<p id="status" class="muted"></p>
+<div id="out"></div>
+<script src="common.js"></script>
+<script>
+document.getElementById("load").onclick = async () => {
+  try {
+    setStatus("Signing in...");
+    const token = await getToken("openid email");
+    const d = await api("/api/mine", token);
+    const out = document.getElementById("out");
+    out.replaceChildren();
+    if (!d.installed) {
+      out.append(el("p", "No data yet. Install the tracker app and sign in on your phone."));
+    } else {
+      out.append(el("p", "Last 7 days: " + mins(d.totalSeconds)));
+      out.append(el("p", appsText(d.byApp)));
+    }
+    setStatus("");
+  } catch (e) { setStatus(e.message, true); }
+};
+</script>
+</body></html>
