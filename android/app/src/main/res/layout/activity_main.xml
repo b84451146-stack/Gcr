@@ -2,33 +2,126 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#FFFDF6E3"
     android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:padding="12dp">
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="GCR Eco Tracker"
+            android:fontFamily="monospace"
+            android:gravity="center"
+            android:text="GCR ECO"
+            android:textColor="#FF222222"
             android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <org.gcreco.tracker.GameView
+            android:id="@+id/gameView"
+            android:layout_width="match_parent"
+            android:layout_height="400dp"
+            android:layout_marginTop="8dp" />
+
+        <TextView
+            android:id="@+id/tvQuiz"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:fontFamily="monospace"
+            android:gravity="center"
+            android:text="QUIZZES LEFT TODAY: 3/3"
+            android:textColor="#FF222222"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnQuiz"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="4dp"
+                android:layout_weight="1"
+                android:text="RESTORE THE DAM" />
+
+            <Button
+                android:id="@+id/btnBadges"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_weight="1"
+                android:text="BADGES AND MISSIONS" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:fontFamily="monospace"
+            android:text="AI USAGE"
+            android:textColor="#FF222222"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvToday"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Today"
+            android:textColor="#FF222222"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/tvWeek"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Last 7 days"
+            android:textColor="#FF222222"
+            android:textSize="15sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Water numbers are educational estimates for the game (1 minute of AI use = 0.5% of the dam). They are not real measurements of any data centre."
+            android:textColor="#FF555555"
+            android:textSize="12sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:fontFamily="monospace"
+            android:text="SETTINGS"
+            android:textColor="#FF222222"
+            android:textSize="18sp"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/tvStatus"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="Not signed in" />
+            android:layout_marginTop="4dp"
+            android:text="Not set up yet"
+            android:textColor="#FF222222"
+            android:textSize="15sp" />
 
         <Button
             android:id="@+id/btnSignIn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Sign in with school Google account" />
+            android:text="Set up name, email and class code" />
 
         <Button
             android:id="@+id/btnPermission"
@@ -41,55 +134,38 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:checked="true"
-            android:text="Tracking and syncing on" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="Today"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/tvToday"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="-" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Last 7 days"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/tvWeek"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="-" />
+            android:text="Tracking and syncing on"
+            android:textColor="#FF222222"
+            android:textSize="15sp" />
 
         <Button
             android:id="@+id/btnSync"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
             android:text="Sync now" />
 
         <TextView
             android:id="@+id/tvSync"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="" />
+            android:text="Never synced"
+            android:textColor="#FF222222"
+            android:textSize="14sp" />
+
+        <Button
+            android:id="@+id/btnReset"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Reset game" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="Privacy: this app only reads how long supported AI apps were open on this phone. It cannot see prompts or conversations, and it does not detect AI used in a browser or other unsupported apps. Only app name, date and duration are sent to your teacher's Classroom report. You can turn tracking off at any time."
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="24dp"
+            android:text="Privacy: this app only reads how long supported AI apps (ChatGPT, Claude, Gemini and others in the list) were open on this phone. It cannot see prompts or conversations, and it does not detect AI used in a browser or other unsupported apps. Only your name, email, app name, date and duration are sent to your teacher's sheet. Game progress stays on this phone. You can turn tracking off at any time."
+            android:textColor="#FF555555"
             android:textSize="12sp" />
     </LinearLayout>
 </ScrollView>
