@@ -2,6 +2,8 @@ name: Android build
 on:
   push:
   workflow_dispatch:
+permissions:
+  contents: write
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -13,6 +15,20 @@ jobs:
           java-version: 17
       - name: Accept Android licenses
         run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses || true
+      - name: Stable debug signing key
+        run: |
+          mkdir -p ~/.android
+          if [ ! -f android/debug.keystore ]; then
+            keytool -genkeypair -keystore android/debug.keystore -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+            git config user.name github-actions
+            git config user.email actions@github.com
+            git add android/debug.keystore
+            git commit -m "Add debug keystore"
+            git push
+          fi
+          cp android/debug.keystore ~/.android/debug.keystore
+          echo '## SHA-1 for Firebase' >> "$GITHUB_STEP_SUMMARY"
+          keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android | grep -E 'SHA1|SHA256' >> "$GITHUB_STEP_SUMMARY"
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: 8.7
