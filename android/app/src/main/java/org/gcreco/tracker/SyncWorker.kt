@@ -11,7 +11,11 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.time.LocalDate
 
-/** Sends the last 7 days of AI-app durations to the teacher's Google Sheet. Runs hourly, only with network. */
+/**
+ * Sends the last 7 days of AI-app durations, plus today's game numbers
+ * (water lost, water restored, dam level, quizzes), to the teacher's Google Sheet.
+ * Runs hourly, only with network.
+ */
 class SyncWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(ctx, params) {
 
     override suspend fun doWork(): Result {
@@ -45,11 +49,42 @@ class SyncWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(ctx, 
                     )
                 }
             }
+
+            // today's totals, grouped for the student summary row
+            val todayMap = reader.secondsForDay(today)
+            var chat = 0L
+            var gem = 0L
+            var cla = 0L
+            var oth = 0L
+            todayMap.forEach { (pkg, secs) ->
+                val n = AiApps.nameOf(pkg).lowercase()
+                when {
+                    "chatgpt" in n || "openai" in n -> chat += secs
+                    "gemini" in n -> gem += secs
+                    "claude" in n -> cla += secs
+                    else -> oth += secs
+                }
+            }
+            val totalToday = todayMap.values.sum()
+            val gs = GameState(applicationContext)
+            gs.applyUsage(totalToday, System.currentTimeMillis())
+            val game = JSONObject()
+                .put("chatgpt", chat / 60.0)
+                .put("gemini", gem / 60.0)
+                .put("claude", cla / 60.0)
+                .put("other", oth / 60.0)
+                .put("total", totalToday / 60.0)
+                .put("lost", gs.deductedToday.toDouble())
+                .put("restored", gs.restoredToday.toDouble())
+                .put("dam", gs.dam.toDouble())
+                .put("quizzes", gs.correctToday())
+
             val body = JSONObject()
                 .put("code", prefs.classCode)
                 .put("email", prefs.studentEmail)
                 .put("name", prefs.studentName)
                 .put("rows", rows)
+                .put("today", game)
                 .toString()
 
             val reply = withContext(Dispatchers.IO) { post(body) }
